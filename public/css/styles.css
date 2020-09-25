@@ -1,8 +1,11 @@
 
 body {
-  background-color: #E8ECEF;
+  background-color: skyblue;
 }
 
+.jumbotron {
+  background-color: skyblue;
+}
 .centered {
     padding-top: 200px;
     text-align: center;
@@ -13,4 +16,17 @@ body {
   font-size: 2rem;
   color: #fff;
   background-color: #000;
+}
+
+.explanations_header {
+  padding-top: 7.5%;
+}
+
+.explanation {
+  text-align: left;
+}
+
+.table {
+  margin-left: auto;
+  margin-right: auto;
 }

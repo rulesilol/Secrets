@@ -1,4 +1,3 @@
-//jshint esversion:6
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -7,6 +6,7 @@ const mongoose = require("mongoose");
 const session = require('express-session');
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
+const e = require('express');
 
 const app = express();
 
@@ -26,12 +26,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://localhost:27017/userDB", { useNewUrlParser: true, useUnifiedTopology: true })
+const uri = "mongodb+srv://Andrew:blackwing1@cluster0.yzts9.mongodb.net/userDB?retryWrites=true&w=majority"
+// mongoose.connect("mongodb://localhost:27017/userDB", { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 mongoose.set('useCreateIndex', true)
 
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String
+    password: String,
 });
 
 userSchema.plugin(passportLocalMongoose);
@@ -49,7 +51,14 @@ passport.deserializeUser(User.deserializeUser());
 passport.use(User.create)
 
 app.get("/", function (req, res) {
-    res.render("home");
+    User.find({}, function (err, users) {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log(users)
+            res.render("home", {users: users})
+        }
+    })
 });
 
 app.get("/login", function (req, res) {
@@ -57,12 +66,12 @@ app.get("/login", function (req, res) {
 });
 
 app.get("/secrets", function (req, res) {
-    User.find({"secrets": {$ne: null}}, function(err, foundUsers) {
+    User.find({ "secrets": { $ne: null } }, function (err, foundUsers) {
         if (err) {
             console.log(err)
         } else {
             if (foundUsers) {
-                res.render("secrets", {usersWithSecrets: foundUsers});
+                res.render("secrets", { usersWithSecrets: foundUsers });
             }
         }
     })
@@ -72,7 +81,7 @@ app.get("/register", function (req, res) {
     res.render("register");
 });
 
-app.get("/logout", function(req, res){
+app.get("/logout", function (req, res) {
     req.logOut();
     res.redirect("/");
 });
@@ -106,6 +115,9 @@ app.post("/login", function (req, res) {
         }
     });
 });
+
+
+
 
 app.listen(3000, function () {
     console.log("Server successfuly started on port 3000.");
